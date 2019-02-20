@@ -32,12 +32,17 @@ export ELASTIC_APM_SECRET_TOKEN=##################
 export ELASTIC_APM_TRACE_METHODS=co.elastic.apm.opbeans.*#*
 ```
 
+### Source the environment vars
+`source ./environment`
+
+### Grab the source for the sample app
 `git clone https://github.com/roncohen/apm-integration-testing.git`
 
 `cd apm-integration-testing`
 
 `git checkout explicit-networks`
 
+### Start the app
 `./scripts/compose.py start master --apm-server-url=$ELASTIC_APM_SERVER_URL --apm-server-secret-token=$ELASTIC_APM_SECRET_TOKEN --no-apm-server --no-elasticsearch --no-kibana --with-opbeans-node --with-opbeans-ruby --with-opbeans-go  --no-metricbeat --no-filebeat`
 
 ### Start collecting logs and metrics
@@ -47,3 +52,7 @@ After the downloads happen and things start running, then deploy Filebeat and Me
 `bash ./metricbeat.cmd`
 
 `bash ./filebeat.cmd`
+
+### Have a look
+Navigate to Kibana in your Elasticsearch Service instance
+
