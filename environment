@@ -1,0 +1,5 @@
+export ELASTIC_APM_SERVER_URL=<https:// get this from your Elasticsearch Service deployment>
+export ELASTIC_CLOUD_ID=<get this from your Elasticsearch Service deployment>
+export ELASTIC_CLOUD_CREDENTIALS=elastic:<password from the Elasticsearch Service deployment(note it is elastic:password)>
+export ELASTIC_APM_SECRET_TOKEN=c<get this from your Elasticsearch Service deployment>
+export ELASTIC_APM_TRACE_METHODS=co.elastic.apm.opbeans.*#*
