@@ -10,12 +10,10 @@ Make sure that you have APM enabled when you create the deployment
 
 Make sure that you copy the `elastic` user password.  All of the other details can be retrieved later, but if you lose the `elastic` password you have to reset that password.
 
-### foo
-`mkdir APM-example`
+### Grab this repo
+`git clone git@github.com:DanRoscigno/docker_observability.git`
 
-`cd APM-example/`
-
-`curl -L https://github.com/kubernetes/kompose/releases/download/v1.16.0/kompose-darwin-amd64 -o kompose`
+`cd docker_observability/`
 
 ### Set your environment vars
 The functionality depends on having a connection to the Elastic Stack.  Edit the file `environment` and set your specifics.  They will look something like this:
@@ -52,6 +50,8 @@ After the downloads happen and things start running, then deploy Filebeat and Me
 `bash ./metricbeat.cmd`
 
 `bash ./filebeat.cmd`
+
+### Add in uptime / heartbeat here
 
 ### Have a look
 Navigate to Kibana in your Elasticsearch Service instance
