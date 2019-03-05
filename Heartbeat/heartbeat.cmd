@@ -15,6 +15,15 @@
 
 docker network create course_stack
 
+echo "Do you wish to remove any existing containers named elasticsearch, kibana, or heartbeat?"
+select ync in "Yes" "No" "Cancel"; do
+    case $ync in
+        Yes ) docker rm -f elasticsearch;docker rm -f kibana;docker rm -f heartbeat; break;;
+        No ) echo "Continuing ..."; break;;
+        Cancel ) exit;;
+    esac
+done
+
 # Note that I am adding labels for hint based Beats autodiscover, if you
 # run Filebeat and Metricbeat and configure them for hints based autodiscover
 # then the Elasticsearch and Kibana logs and metrics will be automatically
@@ -70,3 +79,7 @@ docker run -d \
   docker.elastic.co/beats/heartbeat:7.0.0-beta1 \
   --strict.perms=false -e \
   -E output.elasticsearch.hosts=["elasticsearch:9200"]
+
+echo "Open a browser to http://localhost:5601/"
+
+
