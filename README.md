@@ -47,9 +47,9 @@ export ELASTIC_APM_TRACE_METHODS=co.elastic.apm.opbeans.*#*
 After the downloads happen and things start running, then deploy Filebeat and Metricbeat
 `cd ..`
 
-`bash ./metricbeat.cmd`
+`bash ./metricbeat.sh`
 
-`bash ./filebeat.cmd`
+`bash ./filebeat.sh`
 
 ### Add in uptime / heartbeat here
 

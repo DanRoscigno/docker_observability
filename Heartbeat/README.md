@@ -3,7 +3,7 @@
 1. Port 5601 open
 
 ## Setup
-The script `heartbeat.cmd` will deploy Elasticsearch 7.0.0-beta1, Kibana (same version), and Heartbeat in Docker containers.  Port 5601 is exposed for Kibana.  The script will 
+The script `heartbeat.sh` will deploy Elasticsearch 7.0.0-beta1, Kibana (same version), and Heartbeat in Docker containers.  Port 5601 is exposed for Kibana.  The script will 
 
 1. Offer to remove existing containers named `elasticsearch`, `kibana`, and `heartbeat`.  
 1. Create a Docker network
@@ -12,7 +12,7 @@ The script `heartbeat.cmd` will deploy Elasticsearch 7.0.0-beta1, Kibana (same v
 1. Deploy Heartbeat
 
 ### Steps
-`./heartbeat.cmd`
+`./heartbeat.sh`
 
 Launch a browser to http://localhost:5601/
 
