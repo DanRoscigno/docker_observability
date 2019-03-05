@@ -1,3 +1,5 @@
+#!/bin/sh
+
 ###
 # These commands are not necessarily meant to be run
 # as a script, I run them one at a time by copying and
@@ -5,7 +7,7 @@
 # Elasticsearch and also after starting Kibana to make
 # sure that things are started up before continuing.
 # See https://github.com/elastic/katacoda-scenarios/blob/master/managing-docker/assets/healthstate.sh
-# if you want to do this.
+# if you want to do this. (I added this in)
 ###
 
 # There are multiple ways of setting up networking between Docker containers.
@@ -32,6 +34,8 @@ docker run -d \
   --health-cmd='curl -s -f http://localhost:9200/_cat/health' \
   docker.elastic.co/elasticsearch/elasticsearch:6.7.0-SNAPSHOT
 
+./healthstate.sh elasticsearch
+
 # This starts Kibana.  Do not run this until Elasticsearch is healthy (docker ps)
 
 docker run -d \
@@ -43,6 +47,8 @@ docker run -d \
   --label co.elastic.metrics/module=kibana \
   --label co.elastic.metrics/hosts='${data.host}:${data.port}' \
   docker.elastic.co/kibana/kibana:6.7.0-SNAPSHOT
+
+./healthstate.sh kibana
 
 # This is the setup command for Heartbeat.  It loads configs into Elasticsearch
 # and Kibana.  Do not run this until Kibana is healthy (docker ps)
