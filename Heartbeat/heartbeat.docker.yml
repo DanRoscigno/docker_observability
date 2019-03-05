@@ -1,0 +1,73 @@
+heartbeat.monitors:
+- type: icmp
+  schedule: '@every 5s'
+  hosts:
+    - "www.elastic.co"
+    - "discuss.elastic.co"
+    - "www.google.com"
+    - "localhost"
+- type: http
+  schedule: '@every 5s'
+  urls:
+    - "http://www.elastic.co"
+  check.response.status: 301
+- type: tcp
+  schedule: '@every 30s'
+  hosts:
+    - "8.8.8.8:53"
+- type: http
+  schedule: '@every 5s'
+  urls:
+    - "https://www.google.com"
+    - "http://www.google.com"
+    - "https://discuss.elastic.co"
+    - "https://www.elastic.co"
+    - "https://demo.elastic.co"
+    - "http://fake.elastic.co"
+    - "https://github.com/elastic/kibana"
+  check.response.status: 200
+- type: http
+  schedule: '@every 5s'
+  urls:
+    - "https://www.elastic.co/solutions/apm"
+  check.response:
+    status: 200
+    body: "Open Source Application Performance Monitoring"
+- type: http
+  schedule: '@every 5s'
+  urls:
+    - "https://www.elastic.co/solutions/apm"
+  check.response:
+    status: 200
+    body: "Not there"
+- type: http
+  schedule: '@every 1s'
+  urls:
+    - "https://www.elastic.co/solutions/security-analytics"
+  check.response:
+    body: "Can't find this"
+- type: http
+  schedule: '@every 5s'
+  urls:
+    - "https://www.elastic.co/solutions/security-analytics"
+  check.response:
+    body: "Threats don't follow templates"
+- type: http
+  schedule: '@every 1s'
+  urls:
+    - "https://www.elastic.co/products/beats/heartbeat"
+  check.response:
+    body: "Lightweight Shipper for Uptime Monitoring!"
+    status: 200
+- type: http
+  schedule: '@every 5s'
+  urls:
+    - "https://www.elastic.co/use-cases/"
+  check.response:
+    body: "Stories from Users Like YouXX"
+- type: http
+  schedule: '@every 6s'
+  urls:
+    - "https://www.elastic.co/use-cases/"
+  check.response:
+    body: "Stories from Users Like You"
