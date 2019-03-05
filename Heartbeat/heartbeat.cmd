@@ -32,7 +32,7 @@ docker run -d \
   --network=course_stack \
   -p 9300:9300 -p 9200:9200 \
   --health-cmd='curl -s -f http://localhost:9200/_cat/health' \
-  docker.elastic.co/elasticsearch/elasticsearch:6.7.0-SNAPSHOT
+  docker.elastic.co/elasticsearch/elasticsearch:7.0.0-beta1
 
 ./healthstate.sh elasticsearch
 
@@ -46,7 +46,7 @@ docker run -d \
   --label co.elastic.logs/module=kibana \
   --label co.elastic.metrics/module=kibana \
   --label co.elastic.metrics/hosts='${data.host}:${data.port}' \
-  docker.elastic.co/kibana/kibana:6.7.0-SNAPSHOT
+  docker.elastic.co/kibana/kibana:7.0.0-beta1
 
 ./healthstate.sh kibana
 
@@ -55,7 +55,7 @@ docker run -d \
 
 docker run \
   --network=course_stack \
-  docker.elastic.co/beats/heartbeat:6.7.0-SNAPSHOT \
+  docker.elastic.co/beats/heartbeat:7.0.0-beta1 \
   setup -E setup.kibana.host=kibana:5601 \
   -E output.elasticsearch.hosts=["elasticsearch:9200"]
 
@@ -67,6 +67,6 @@ docker run -d \
   --user=heartbeat \
   --network=course_stack \
   --volume="$(pwd)/heartbeat.docker.yml:/usr/share/heartbeat/heartbeat.yml:ro" \
-  docker.elastic.co/beats/heartbeat:6.7.0-SNAPSHOT \
+  docker.elastic.co/beats/heartbeat:7.0.0-beta1 \
   --strict.perms=false -e \
   -E output.elasticsearch.hosts=["elasticsearch:9200"]
