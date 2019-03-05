@@ -69,7 +69,7 @@ docker run \
   -E output.elasticsearch.hosts=["elasticsearch:9200"]
 
 # This grabs a sample config for Heartbeat.
-curl -L -O https://raw.githubusercontent.com/elastic/beats/6.6/deploy/docker/heartbeat.docker.yml
+#curl -L -O https://raw.githubusercontent.com/elastic/beats/6.6/deploy/docker/heartbeat.docker.yml
 
 docker run -d \
   --name=heartbeat \
