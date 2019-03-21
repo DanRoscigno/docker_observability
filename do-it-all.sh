@@ -18,7 +18,7 @@ docker network create course_stack
 echo "Do you wish to remove any existing containers named elasticsearch, kibana, metricbeat, filebeat, heartbeat, and nginx?"
 select ynq in "Yes" "No" "Quit"; do
     case $ynq in
-        Yes ) docker rm -f elasticsearch;docker rm -f kibana;docker rm -f heartbeat; docker rm -f metricbeat; docker rm -f filebeat; break;;
+        Yes ) docker rm -f elasticsearch;docker rm -f kibana;docker rm -f heartbeat; docker rm -f metricbeat; docker rm -f filebeat; docker rm -f nginx; break;;
         No ) echo "Continuing ..."; break;;
         Quit ) exit;;
     esac
