@@ -1,1 +1,3 @@
 my.environment
+filebeat.docker.yml
+metricbeat.docker.yml

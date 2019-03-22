@@ -1,3 +1,4 @@
+#!/bin/bash
 
 docker run \
   docker.elastic.co/beats/filebeat:7.0.0-SNAPSHOT \

@@ -34,11 +34,9 @@ export ELASTIC_APM_TRACE_METHODS=co.elastic.apm.opbeans.*#*
 `source ./environment`
 
 ### Grab the source for the sample app
-`git clone https://github.com/roncohen/apm-integration-testing.git`
+`git clone https://github.com/elastic/apm-integration-testing.git`
 
 `cd apm-integration-testing`
-
-`git checkout explicit-networks`
 
 ### Start the app
 `./scripts/compose.py start master --apm-server-url=$ELASTIC_APM_SERVER_URL --apm-server-secret-token=$ELASTIC_APM_SECRET_TOKEN --no-apm-server --no-elasticsearch --no-kibana --with-opbeans-node --with-opbeans-ruby --with-opbeans-go  --no-metricbeat --no-filebeat`
@@ -47,9 +45,9 @@ export ELASTIC_APM_TRACE_METHODS=co.elastic.apm.opbeans.*#*
 After the downloads happen and things start running, then deploy Filebeat and Metricbeat
 `cd ..`
 
-`bash ./metricbeat.sh`
+`./metricbeat.sh`
 
-`bash ./filebeat.sh`
+`./filebeat.sh`
 
 ### Add in uptime / heartbeat here
 
