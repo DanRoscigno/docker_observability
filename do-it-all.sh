@@ -133,7 +133,7 @@ docker run -d \
 wget https://raw.githubusercontent.com/elastic/katacoda-scenarios/master/managing-docker/assets/nginx.conf
 wget https://raw.githubusercontent.com/elastic/katacoda-scenarios/master/managing-docker/assets/nginx-default.conf
 
-echo "Deploying NGINX\n"
+echo "Deploying NGINX, Apache, and Redis\n"
 docker run -d \
   --net course_stack \
   --label co.elastic.logs/module=nginx \
@@ -146,6 +146,55 @@ docker run -d \
   --name nginx \
   -p 8080:8080 nginx:1.15.4
 
+wget https://raw.githubusercontent.com/elastic/katacoda-scenarios/master/managing-docker/assets/apache-mod-status.conf
+
+wget https://raw.githubusercontent.com/elastic/katacoda-scenarios/master/managing-docker/assets/apache2.conf
+
+wget https://raw.githubusercontent.com/elastic/katacoda-scenarios/master/managing-docker/assets/remoteip.load
+
+docker run --name=redis-master \
+  --label co.elastic.logs/module=redis \
+  --label co.elastic.logs/fileset.stdout=log \
+  --label co.elastic.metrics/module=redis \
+  --label co.elastic.metrics/metricsets="info, keyspace" \
+  --label co.elastic.metrics/hosts='${data.host}:${data.port}' \
+  --env="GET_HOSTS_FROM=dns" \
+  --env="HOME=/root" \
+  --volume="/data" \
+  --network=course_stack \
+  --label com.docker.compose.service="redis-master" \
+  --detach=true \
+  gcr.io/google_containers/redis:e2e redis-server /etc/redis/redis.conf
+
+docker run --name=redis-slave \
+  --label co.elastic.logs/module=redis \
+  --label co.elastic.logs/fileset.stdout=log \
+  --label co.elastic.metrics/module=redis \
+  --label co.elastic.metrics/metricsets="info, keyspace" \
+  --label co.elastic.metrics/hosts='${data.host}:${data.port}' \
+  --env="GET_HOSTS_FROM=dns" \
+  --volume="/data" \
+  --network=course_stack \
+  --label com.docker.compose.service="redis-slave" \
+  --detach=true \
+  gcr.io/google_samples/gb-redisslave:v1 /bin/sh -c /run.sh
+
+docker run \
+  --name=frontend \
+  --label co.elastic.logs/module=apache2 \
+  --label co.elastic.logs/fileset.stdout=access \
+  --label co.elastic.logs/fileset.stderr=error \
+  --label co.elastic.metrics/module=apache \
+  --label co.elastic.metrics/metricsets=status \
+  --label co.elastic.metrics/hosts='${data.host}:${data.port}' \
+  -v $(pwd)/apache2.conf:/etc/apache2/apache2.conf:ro \
+  -v $(pwd)/apache-mod-status.conf:/etc/apache2/mods-available/status.conf:ro \
+  -v $(pwd)/remoteip.load:/etc/apache2/mods-enabled/remoteip.load:ro \
+  --env="GET_HOSTS_FROM=dns" \
+  --network=course_stack \
+  --label com.docker.compose.service="frontend" \
+  --detach=true \
+  gcr.io/google-samples/gb-frontend:v4 apache2-foreground
 
 
 echo "Open a browser to http://localhost:5601/"
