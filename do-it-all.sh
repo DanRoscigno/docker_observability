@@ -15,10 +15,10 @@
 
 docker network create course_stack
 
-echo "Do you wish to remove any existing containers named elasticsearch, kibana, metricbeat, filebeat, heartbeat, and nginx?"
+echo "Do you wish to remove any existing containers named elasticsearch, kibana, metricbeat, filebeat, heartbeat, redis-master, redis-slave, frontend, and nginx?"
 select ynq in "Yes" "No" "Quit"; do
     case $ynq in
-        Yes ) docker rm -f elasticsearch;docker rm -f kibana;docker rm -f heartbeat; docker rm -f metricbeat; docker rm -f filebeat; docker rm -f nginx; break;;
+        Yes ) docker rm -f elasticsearch;docker rm -f kibana;docker rm -f heartbeat; docker rm -f metricbeat; docker rm -f filebeat; docker rm -f nginx; docker rm -f redis-master; docker rm -f redis-slave; docker rm -f frontend; break;;
         No ) echo "Continuing ..."; break;;
         Quit ) exit;;
     esac
@@ -43,7 +43,7 @@ docker run -d \
   --network=course_stack \
   -p 9300:9300 -p 9200:9200 \
   --health-cmd='curl -s -f http://localhost:9200/_cat/health' \
-  docker.elastic.co/elasticsearch/elasticsearch:6.6.2
+  docker.elastic.co/elasticsearch/elasticsearch:7.6.2
 
 ./healthstate.sh elasticsearch
 
@@ -58,7 +58,7 @@ docker run -d \
   --label co.elastic.logs/module=kibana \
   --label co.elastic.metrics/module=kibana \
   --label co.elastic.metrics/hosts='${data.host}:${data.port}' \
-  docker.elastic.co/kibana/kibana:6.6.2
+  docker.elastic.co/kibana/kibana:7.6.2
 
 ./healthstate.sh kibana
 
@@ -68,7 +68,7 @@ docker run -d \
 echo "Deploying Heartbeat\n"
 docker run \
   --network=course_stack \
-  docker.elastic.co/beats/heartbeat:6.6.2 \
+  docker.elastic.co/beats/heartbeat:7.6.2 \
   setup -E setup.kibana.host=kibana:5601 \
   -E output.elasticsearch.hosts=["elasticsearch:9200"]
 
@@ -79,15 +79,15 @@ docker run -d \
   --name=heartbeat \
   --user=heartbeat \
   --network=course_stack \
-  --volume="$(pwd)/heartbeat.docker.yml:/usr/share/heartbeat/heartbeat.yml:ro" \
-  docker.elastic.co/beats/heartbeat:6.6.2 \
+  --volume="$(pwd)/Heartbeat/heartbeat.docker.yml:/usr/share/heartbeat/heartbeat.yml:ro" \
+  docker.elastic.co/beats/heartbeat:7.6.2 \
   --strict.perms=false -e \
   -E output.elasticsearch.hosts=["elasticsearch:9200"]
 
 echo "Deploying Metricbeat\n"
 docker run \
   --network=course_stack \
-  docker.elastic.co/beats/metricbeat:6.6.2 \
+  docker.elastic.co/beats/metricbeat:7.6.2 \
   setup -E setup.kibana.host=kibana:5601 \
   -E output.elasticsearch.hosts=["elasticsearch:9200"]
 
@@ -103,7 +103,7 @@ docker run -d \
   --volume="/proc:/hostfs/proc:ro" \
   --volume="/:/hostfs:ro" \
   --volume="/var/run/docker.sock:/var/run/docker.sock:ro" \
-  docker.elastic.co/beats/metricbeat:6.6.2 \
+  docker.elastic.co/beats/metricbeat:7.6.2 \
   -e -strict.perms=false \
   -E output.elasticsearch.hosts=["elasticsearch:9200"]
 
@@ -113,7 +113,7 @@ echo "Deploying Filbeat\n"
 
 docker run \
   --network=course_stack \
-  docker.elastic.co/beats/filebeat:6.6.2 \
+  docker.elastic.co/beats/filebeat:7.6.2 \
   setup -E setup.kibana.host=kibana:5601 \
   -E output.elasticsearch.hosts=["elasticsearch:9200"]
 
@@ -126,7 +126,7 @@ docker run -d \
   --volume="$(pwd)/filebeat.docker.yml:/usr/share/filebeat/filebeat.yml:ro" \
   --volume="/var/lib/docker/containers:/var/lib/docker/containers:ro" \
   --volume="/var/run/docker.sock:/var/run/docker.sock:ro" \
-  docker.elastic.co/beats/filebeat:6.6.2 \
+  docker.elastic.co/beats/filebeat:7.6.2 \
   -e -strict.perms=false \
   -E output.elasticsearch.hosts=["elasticsearch:9200"]
 
@@ -134,18 +134,6 @@ wget https://raw.githubusercontent.com/elastic/katacoda-scenarios/master/managin
 wget https://raw.githubusercontent.com/elastic/katacoda-scenarios/master/managing-docker/assets/nginx-default.conf
 
 echo "Deploying NGINX, Apache, and Redis\n"
-docker run -d \
-  --net course_stack \
-  --label co.elastic.logs/module=nginx \
-  --label co.elastic.logs/fileset.stdout=access \
-  --label co.elastic.logs/fileset.stderr=error \
-  --label co.elastic.metrics/module=nginx \
-  --label co.elastic.metrics/hosts='${data.host}:${data.port}' \
-  -v $(pwd)/nginx.conf:/etc/nginx/nginx.conf:ro \
-  -v $(pwd)/nginx-default.conf:/etc/nginx/conf.d/default.conf:ro \
-  --name nginx \
-  -p 8080:8080 nginx:1.15.4
-
 wget https://raw.githubusercontent.com/elastic/katacoda-scenarios/master/managing-docker/assets/apache-mod-status.conf
 
 wget https://raw.githubusercontent.com/elastic/katacoda-scenarios/master/managing-docker/assets/apache2.conf
@@ -193,8 +181,24 @@ docker run \
   --env="GET_HOSTS_FROM=dns" \
   --network=course_stack \
   --label com.docker.compose.service="frontend" \
+  --health-cmd='curl --fail http://localhost:80/ || exit 1' \
   --detach=true \
   gcr.io/google-samples/gb-frontend:v4 apache2-foreground
+
+# Don't start NGINX until Apache is healthy
+./healthstate.sh frontend
+
+docker run -d \
+  --net course_stack \
+  --label co.elastic.logs/module=nginx \
+  --label co.elastic.logs/fileset.stdout=access \
+  --label co.elastic.logs/fileset.stderr=error \
+  --label co.elastic.metrics/module=nginx \
+  --label co.elastic.metrics/hosts='${data.host}:${data.port}' \
+  -v $(pwd)/nginx.conf:/etc/nginx/nginx.conf:ro \
+  -v $(pwd)/nginx-default.conf:/etc/nginx/conf.d/default.conf:ro \
+  --name nginx \
+  -p 8080:8080 nginx:1.15.4
 
 
 echo "Open a browser to http://localhost:5601/"
